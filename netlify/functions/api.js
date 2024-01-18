@@ -1,21 +1,25 @@
-import express from 'express'
+import express, { Router } from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import 'dotenv/config'
 import mongoose from 'mongoose'
+import Serverless from 'serverless-http'
 
-const app = express()
+const api = express()
+const router = Router()
 
-app.use(cors())
-app.use(bodyParser.json())
+api.use(cors())
+api.use(bodyParser.json())
 
 mongoose.connect(process.env.DATABASE_URL)
 
 const port = 3000
-
-app.listen(port, () => {
-    console.log(`App listening on port: ${port}`)
+router.listen(port, () => {
+    console.log(`router listening on port: ${port}`)
 })
+
+
+
 
 //! SCHEMAS ----------------
 
@@ -90,7 +94,7 @@ const userSchema = new mongoose.Schema({
 
 //! COURSE CRUD --------------------------------
 
-app.post('/course/new', async (req, res) => {
+router.post('/course/new', async (req, res) => {
    const { courseName, location } = req.body
 
     try {
@@ -112,7 +116,7 @@ app.post('/course/new', async (req, res) => {
     }
 })
 
-app.get('/course', async (req, res) => {
+router.get('/course', async (req, res) => {
     try {
         const allCourses = await Course.find({})
         return res.status(200).json(allCourses)
@@ -122,7 +126,7 @@ app.get('/course', async (req, res) => {
     }
 })
 
-app.get('/course/:id', async (req, res) => {
+router.get('/course/:id', async (req, res) => {
     try {
         const id = req.params.id
         const singleCourse = await Course.findById(id)
@@ -140,7 +144,7 @@ app.get('/course/:id', async (req, res) => {
     }
 })
 
-app.put('/course/edit/:id', async (req, res) => {
+router.put('/course/edit/:id', async (req, res) => {
     try {
         const id = req.params.id
         const updatedCourse = await Course.findByIdAndUpdate(
@@ -167,7 +171,7 @@ app.put('/course/edit/:id', async (req, res) => {
     }
 })
 
-app.delete('/course/:id', async (req, res) => {
+router.delete('/course/:id', async (req, res) => {
     try {
         const id = req.params.id
         await Course.findByIdAndDelete(id)
@@ -181,7 +185,7 @@ app.delete('/course/:id', async (req, res) => {
 
 //! SCORECARD CRUD ---------------------
 
-app.post('/scorecard/new', async (req, res) => {
+router.post('/scorecard/new', async (req, res) => {
     const { playerName, courseName, date, weather } = req.body
 
     try {
@@ -204,7 +208,7 @@ app.post('/scorecard/new', async (req, res) => {
     }
 })
 
-app.get('/scorecard', async (req, res) => {
+router.get('/scorecard', async (req, res) => {
     try {
         const allScorecards = await Scorecard.find({})
         return res.status(200).json(allScorecards)
@@ -214,7 +218,7 @@ app.get('/scorecard', async (req, res) => {
     }
 })
 
-app.get('/scorecard/:id', async (req, res) => {
+router.get('/scorecard/:id', async (req, res) => {
     try {
         const id = req.params.id
         const singleScorecard = await Scorecard.findById(id)
@@ -226,7 +230,7 @@ app.get('/scorecard/:id', async (req, res) => {
     }
 })
 
-app.put('/scorecard/edit/:id', async (req, res) => {
+router.put('/scorecard/edit/:id', async (req, res) => {
     try {
         const id = req.params.id
         const existingScorecard = await Scorecard.findById(id)
@@ -261,7 +265,7 @@ app.put('/scorecard/edit/:id', async (req, res) => {
     }
 })
 
-app.delete('/scorecard/:id', async (req, res) => {
+router.delete('/scorecard/:id', async (req, res) => {
     try {
         const id = req.params.id
         await Scorecard.findByIdAndDelete(id)
@@ -274,7 +278,7 @@ app.delete('/scorecard/:id', async (req, res) => {
 
 //! USER ----------------------
 
-app.post('/user/login', async (req, res) => {
+router.post('/user/login', async (req, res) => {
     try {
         const now = new Date()
         const existingUserCount = await User.countDocuments({"userEmail": req.body.userEmail})
@@ -300,3 +304,6 @@ app.post('/user/login', async (req, res) => {
     }
 })
       
+router.use('/api', router)
+
+export const handler = Serverless(api)
