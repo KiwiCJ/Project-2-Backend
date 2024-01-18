@@ -22,6 +22,7 @@ app.listen(port, () => {
 const courseSchema = new mongoose.Schema({
     courseName: { type: String },
     location: { type: String },
+    comment: { type: String },
     coursePar: { type: Number },
     bestScore: { type: Number }
 })
@@ -148,6 +149,7 @@ app.put('/course/edit/:id', async (req, res) => {
             {
                 courseName: req.body.courseName,
                 location: req.body.location,
+                comment: req.body.comment
             },
             { new: true }
         )
@@ -182,18 +184,31 @@ app.delete('/course/:id', async (req, res) => {
 //! SCORECARD CRUD ---------------------
 
 app.post('/scorecard/new', async (req, res) => {
-    const { playerName, courseName, date, weather } = req.body
+    const { playerName, courseName, date, weather, location } = req.body
 
     try {
-        if (!playerName || !courseName || !date || !weather) {
+        if (!playerName || !courseName || !date || !weather || !location) {
             return res.status(400).json({error: 'Player name, course name, date, and weather are all required'})
+        }
+
+                   
+        const existingCourse = await Course.findOne({ courseName });
+
+        if (!existingCourse) {                   
+            const newCourse = new Course({
+                courseName,
+                location
+            })
+            
+            await newCourse.save()
         }
 
         const newScorecard = new Scorecard ({
             playerName,
             courseName,
             date,
-            weather
+            weather,
+            location
         })
         const savedScorecard = await newScorecard.save()
         res.status(200).json(savedScorecard)
