@@ -13,10 +13,10 @@ api.use(bodyParser.json())
 
 mongoose.connect(process.env.DATABASE_URL)
 
-const port = 3000
-router.listen(port, () => {
-    console.log(`router listening on port: ${port}`)
-})
+// const port = 3000
+// router.listen(port, () => {
+//     console.log(`router listening on port: ${port}`)
+// })
 
 
 
