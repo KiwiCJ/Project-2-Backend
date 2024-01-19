@@ -3,7 +3,7 @@ import bodyParser from 'body-parser'
 import cors from 'cors'
 import 'dotenv/config'
 import mongoose from 'mongoose'
-import Serverless from 'serverless-http'
+import serverless from 'serverless-http'
 
 const api = express()
 const router = Router()
@@ -12,13 +12,6 @@ api.use(cors())
 api.use(bodyParser.json())
 
 mongoose.connect(process.env.DATABASE_URL)
-
-// const port = 3000
-// router.listen(port, () => {
-//     console.log(`router listening on port: ${port}`)
-// })
-
-
 
 
 //! SCHEMAS ----------------
@@ -306,4 +299,4 @@ router.post('/user/login', async (req, res) => {
       
 router.use('/api', router)
 
-export const handler = Serverless(api)
+export const handler = serverless(api)
