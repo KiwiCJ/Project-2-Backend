@@ -1,4 +1,4 @@
-import express, { Router } from 'express'
+import express from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import 'dotenv/config'
@@ -6,7 +6,7 @@ import mongoose from 'mongoose'
 import serverless from 'serverless-http'
 
 const api = express()
-const router = Router()
+const router = express.Router()
 
 api.use(cors())
 api.use(bodyParser.json())
@@ -297,6 +297,6 @@ router.post('/user/login', async (req, res) => {
     }
 })
       
-router.use('/api', router)
+api.use('/api', router)
 
 export const handler = serverless(api)
